@@ -1,0 +1,18 @@
+{
+	"$schema": "https://json.schemastore.org/package.json",
+	"name": "citadel",
+	"version": "0.1.0",
+	"description": "A simple, open-source, self-hosted password manager.",
+	"private": true,
+	"keywords": [],
+	"author": "felix-kyun",
+	"license": "UNLICENSE",
+	"scripts": {
+		"dev": "pnpm --parallel dev",
+		"format": "biome format --write"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.4.4",
+		"typescript": "^5.9.3"
+	}
+}
