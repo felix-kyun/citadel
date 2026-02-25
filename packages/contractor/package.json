@@ -1,7 +1,7 @@
 {
 	"name": "@citadel/contractor",
 	"version": "0.1.0",
-	"main": "index.ts",
+	"main": "src/index.ts",
 	"scripts": {
 		"typecheck": "tsc --noEmit --watch"
 	},
