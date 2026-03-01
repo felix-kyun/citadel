@@ -1,16 +1,21 @@
 import type { Method } from "./Method";
 import type z from "zod";
-import type { Payload } from "./Payload";
-import type { Response } from "./Response";
 
 export interface Contract<
-    TBody extends z.ZodRawShape = z.ZodRawShape,
-    TQuery extends z.ZodRawShape = z.ZodRawShape,
-    TParams extends z.ZodRawShape = z.ZodRawShape,
-    TResponse extends z.ZodRawShape = z.ZodRawShape,
+    TBody extends z.ZodType = z.ZodType,
+    TQuery extends z.ZodType = z.ZodType,
+    TParams extends z.ZodType = z.ZodType,
+    TResponse extends z.ZodType = z.ZodType,
 > {
     method: Method;
     route: string;
-    payload: Payload<TBody, TQuery, TParams>;
-    response: Response<TResponse>;
+    payload: {
+        body: TBody;
+        query: TQuery;
+        params: TParams;
+    };
+    response: z.ZodObject<{
+        code: z.ZodString;
+        data: TResponse;
+    }>;
 }

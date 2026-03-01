@@ -1,25 +1,33 @@
 import z from "zod";
-import type { BaseContract } from "./types/BaseContract";
+import type { Method } from "./types/Method";
 import type { Contract } from "./types/Contract";
 
 export function defineContract<
-    TBody extends z.ZodRawShape = Record<string, never>,
-    TQuery extends z.ZodRawShape = Record<string, never>,
-    TParams extends z.ZodRawShape = Record<string, never>,
-    TResponse extends z.ZodRawShape = Record<string, never>,
->(
-    contract: BaseContract<TBody, TQuery, TParams, TResponse>,
-): Contract<TBody, TQuery, TParams, TResponse> {
+    TBody extends z.ZodType = z.ZodNever,
+    TQuery extends z.ZodType = z.ZodNever,
+    TParams extends z.ZodType = z.ZodNever,
+    TResponse extends z.ZodType = z.ZodNever,
+>(contract: {
+    method: Method;
+    route: string;
+    payload?: {
+        body?: TBody;
+        query?: TQuery;
+        params?: TParams;
+    };
+    response?: TResponse;
+}): Contract<TBody, TQuery, TParams, TResponse> {
     return {
-        ...contract,
+        method: contract.method,
+        route: contract.route,
         payload: {
-            body: contract.payload?.body ?? z.object<TBody>(),
-            query: contract.payload?.query ?? z.object<TQuery>(),
-            params: contract.payload?.params ?? z.object<TParams>(),
+            body: (contract.payload?.body ?? z.never()) as TBody,
+            query: (contract.payload?.query ?? z.never()) as TQuery,
+            params: (contract.payload?.params ?? z.never()) as TParams,
         },
         response: z.object({
             code: z.string(),
-            data: contract.response,
+            data: (contract.response ?? z.never()) as TResponse,
         }),
     };
 }
