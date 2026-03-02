@@ -3,6 +3,7 @@ import type {
     InferPayload,
     InferResponse,
     ClientOptions,
+    FilterNever,
 } from "../types/utils";
 import { fetchClient } from "./fetchClient";
 import z from "zod";
@@ -26,7 +27,9 @@ function isContract(schema: SchemaNode | Contract): schema is Contract {
 
 type Transform<T> = {
     [K in keyof T]: T[K] extends Contract
-        ? (payload: InferPayload<T[K]>) => Promise<InferResponse<T[K]>>
+        ? (
+              payload: FilterNever<InferPayload<T[K]>>,
+          ) => Promise<InferResponse<T[K]>>
         : Transform<T[K]>;
 };
 
