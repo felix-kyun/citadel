@@ -46,7 +46,7 @@ function buildSchema<T extends SchemaNode>(
             if (isContract(value)) {
                 return [
                     key,
-                    (payload) => {
+                    (payload: InferPayload<T[typeof key]>) => {
                         return fetchClient(value, payload, options);
                     },
                 ];
