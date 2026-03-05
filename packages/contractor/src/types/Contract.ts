@@ -1,5 +1,5 @@
-import type { Method } from "./Method";
 import type z from "zod";
+import type { Method } from "./Method";
 
 export interface Contract<
 	TBody extends z.ZodType = z.ZodType,

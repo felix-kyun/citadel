@@ -1,12 +1,12 @@
+import z from "zod";
 import type { Contract } from "../types/Contract";
 import type {
-	InferPayload,
-	InferResponse,
 	ClientOptions,
 	FilterNever,
+	InferPayload,
+	InferResponse,
 } from "../types/utils";
 import { fetchClient } from "./fetchClient";
-import z from "zod";
 
 const contractSchema = z.object({
 	method: z.enum(["GET", "POST", "PUT", "DELETE", "PATCH"]),

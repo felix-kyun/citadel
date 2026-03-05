@@ -1,2 +1,2 @@
-export { defineContract } from "./defineContract";
 export { createClient } from "./client/client";
+export { defineContract } from "./defineContract";

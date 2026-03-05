@@ -1,7 +1,7 @@
 import type { Contract } from "../types/Contract";
 import type {
-	InferPayload,
 	ClientOptions,
+	InferPayload,
 	InferResponse,
 } from "../types/utils";
 
