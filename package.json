@@ -1,25 +1,27 @@
 {
-    "$schema": "https://json.schemastore.org/package.json",
-    "name": "citadel",
-    "version": "0.1.0",
-    "description": "A simple, open-source, self-hosted password manager.",
-    "private": true,
-    "keywords": [],
-    "author": "felix-kyun",
-    "license": "UNLICENSE",
-    "lint-staged": {
-        "*.{ts,tsx,js,jsx}": [
-            "biome check --write"
-        ]
-    },
-    "scripts": {
-        "dev": "pnpm --parallel dev",
-        "format": "biome format --write",
-        "lint": "biome check --write"
-    },
-    "devDependencies": {
-        "@biomejs/biome": "^2.4.4",
-        "lint-staged": "^16.3.2",
-        "typescript": "^5.9.3"
-    }
+	"$schema": "https://json.schemastore.org/package.json",
+	"name": "citadel",
+	"version": "0.1.0",
+	"description": "A simple, open-source, self-hosted password manager.",
+	"private": true,
+	"keywords": [],
+	"author": "felix-kyun",
+	"license": "UNLICENSE",
+	"lint-staged": {
+		"*.{ts,tsx,js,jsx,json}": [
+			"biome check --write"
+		]
+	},
+	"scripts": {
+		"dev": "pnpm --parallel dev",
+		"format": "biome format --write",
+		"lint": "biome check --write",
+		"prepare": "husky"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.4.4",
+		"husky": "^9.1.7",
+		"lint-staged": "^16.3.2",
+		"typescript": "^5.9.3"
+	}
 }
