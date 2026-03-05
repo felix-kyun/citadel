@@ -28,3 +28,10 @@ export type Clientfn<TContract extends Contract> = (
     payload: InferPayload<TContract>,
     options: ClientOptions,
 ) => Promise<InferResponse<TContract>>;
+
+export type ExtractParams<TString extends string> =
+    TString extends `${infer _TPrefix}:${infer TParam}/${infer TSuffix}`
+        ? { [K in TParam | keyof ExtractParams<TSuffix>]: string }
+        : TString extends `${infer _TPrefix}:${infer TParam}`
+          ? { [K in TParam]: string }
+          : Record<string, never>;
