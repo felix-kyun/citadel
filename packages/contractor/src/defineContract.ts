@@ -18,23 +18,24 @@ type ExtractParams<TRoute extends string> =
  * Checks if the string has any parameters.
  * If so, returns a zod type representing the parameters.
  */
-type Params<TRoute extends string> = z.ZodType<
+type Params<TRoute extends string> =
 	ExtractParams<TRoute> extends Record<string, never>
 		? z.ZodNever
-		: ExtractParams<TRoute>
->;
+		: z.ZodType<ExtractParams<TRoute>>;
 
 /*
  * Defines the payload for a contract.
  */
 type Payload<
+	TMethod extends Method,
+	TRoute extends string,
 	TBody extends z.ZodType,
 	TQuery extends z.ZodType,
-	TParamString extends string,
-> =
-	ExtractParams<TParamString> extends Record<string, never>
-		? { body?: TBody; query?: TQuery }
-		: { body?: TBody; query?: TQuery; params: Params<TParamString> };
+> = ([TMethod] extends ["GET"] ? NonNullable<unknown> : { body: TBody }) &
+	(ExtractParams<TRoute> extends Record<string, never>
+		? NonNullable<unknown>
+		: { params: Params<TRoute> }) &
+	([TQuery] extends [z.ZodNever] ? NonNullable<unknown> : { query: TQuery });
 
 /*
  * Helper for Converting user input to a well defined Contract object.
@@ -49,22 +50,26 @@ export function defineContract<
 >(contract: {
 	method: TMethod;
 	route: TRoute;
-	payload?: Payload<TBody, TQuery, TRoute>;
+	payload?: Payload<TMethod, TRoute, TBody, TQuery>;
 	response?: TResponse;
 }): Contract<TBody, TQuery, Params<TRoute>, TResponse> {
 	// extract payload
-	const params = ((contract.payload !== null &&
-		typeof contract.payload === "object" &&
+	const params = ((contract.payload &&
 		"params" in contract.payload &&
 		contract.payload?.params) ??
 		z.never()) as Params<TRoute>;
+
+	const body = ((contract.payload as undefined | { body: unknown })?.body ??
+		z.never()) as TBody;
+	const query = ((contract.payload as undefined | { query: unknown })?.query ??
+		z.never()) as TQuery;
 
 	return {
 		method: contract.method,
 		route: contract.route,
 		payload: {
-			body: (contract.payload?.body ?? z.never()) as TBody,
-			query: (contract.payload?.query ?? z.never()) as TQuery,
+			body,
+			query,
 			params,
 		},
 		response: z.object({
