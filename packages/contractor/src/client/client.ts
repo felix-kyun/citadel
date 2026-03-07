@@ -6,7 +6,7 @@ import type {
 	InferPayload,
 	InferResponse,
 } from "../types/utils";
-import { fetchClient } from "./fetchClient";
+import { type ClientResponse, fetchClient } from "./fetchClient";
 
 const contractSchema = z.object({
 	method: z.enum(["GET", "POST", "PUT", "DELETE", "PATCH"]),
@@ -27,7 +27,9 @@ function isContract(schema: SchemaNode | Contract): schema is Contract {
 
 type Transform<T> = {
 	[K in keyof T]: T[K] extends Contract
-		? (payload: FilterNever<InferPayload<T[K]>>) => Promise<InferResponse<T[K]>>
+		? (
+				payload: FilterNever<InferPayload<T[K]>>,
+			) => Promise<ClientResponse<T[K]>>
 		: Transform<T[K]>;
 };
 
@@ -59,5 +61,10 @@ export function createClient<T extends SchemaNode>(
 	schema: T,
 	options: ClientOptions,
 ) {
+	// fix base url for use URL
+	if (!options.baseUrl.endsWith("/")) {
+		options.baseUrl = `${options.baseUrl}/`;
+	}
+
 	return buildSchema(schema, options);
 }
