@@ -1,5 +1,5 @@
 import z from "zod";
-import type { Contract } from "./types/Contract";
+import { __contract_type, type Contract } from "./types/Contract";
 import type { Method } from "./types/Method";
 
 /*
@@ -65,6 +65,7 @@ export function defineContract<
 		z.never()) as TQuery;
 
 	return {
+		_type: __contract_type,
 		method: contract.method,
 		route: contract.route,
 		payload: {

@@ -1,28 +1,10 @@
-import z from "zod";
 import type { Contract } from "../types/Contract";
-import type {
-	ClientOptions,
-	FilterNever,
-	InferPayload,
-	InferResponse,
-} from "../types/utils";
+import { __contract_type } from "../types/Contract";
+import type { ClientOptions, FilterNever, InferPayload } from "../types/utils";
 import { type ClientResponse, fetchClient } from "./fetchClient";
 
-const contractSchema = z.object({
-	method: z.enum(["GET", "POST", "PUT", "DELETE", "PATCH"]),
-	route: z.string(),
-	payload: z
-		.object({
-			body: z.object().optional(),
-			params: z.object().optional(),
-			query: z.object().optional(),
-		})
-		.optional(),
-	response: z.object().optional(),
-});
-
 function isContract(schema: SchemaNode | Contract): schema is Contract {
-	return contractSchema.safeParse(schema).success;
+	return schema && "_type" in schema && schema._type === __contract_type;
 }
 
 type Transform<T> = {
