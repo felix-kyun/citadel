@@ -1,5 +1,6 @@
 import z from "zod";
-import { __contract_type, type Contract } from "./types/Contract";
+import type { Contract } from "./types/Contract";
+import type { ContractError } from "./types/ContractError";
 import type { Method } from "./types/Method";
 
 /*
@@ -43,29 +44,31 @@ type Payload<
  */
 export function defineContract<
 	TMethod extends Method = Method,
-	TRoute extends string = "",
+	TRoute extends string = string,
 	TBody extends z.ZodType = z.ZodNever,
 	TQuery extends z.ZodType = z.ZodNever,
 	TResponse extends z.ZodType = z.ZodNever,
+	const TErrors extends Array<ContractError> = [],
 >(contract: {
 	method: TMethod;
 	route: TRoute;
 	payload?: Payload<TMethod, TRoute, TBody, TQuery>;
 	response?: TResponse;
-}): Contract<TBody, TQuery, Params<TRoute>, TResponse> {
+	errors?: TErrors;
+}): Contract<TBody, TQuery, Params<TRoute>, TResponse, TErrors> {
 	// extract payload
 	const params = ((contract.payload &&
 		"params" in contract.payload &&
 		contract.payload?.params) ??
 		z.never()) as Params<TRoute>;
 
-	const body = ((contract.payload as undefined | { body: unknown })?.body ??
+	const body = ((contract.payload as { body?: unknown })?.body ??
 		z.never()) as TBody;
-	const query = ((contract.payload as undefined | { query: unknown })?.query ??
+	const query = ((contract.payload as { query?: unknown })?.query ??
 		z.never()) as TQuery;
 
 	return {
-		_type: __contract_type,
+		_type: "contractor/contract" as const,
 		method: contract.method,
 		route: contract.route,
 		payload: {
@@ -77,5 +80,6 @@ export function defineContract<
 			code: z.string(),
 			data: (contract.response ?? z.never()) as TResponse,
 		}),
+		errors: (contract.errors ?? []) as TErrors,
 	};
 }

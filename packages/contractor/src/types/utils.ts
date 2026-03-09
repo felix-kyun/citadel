@@ -6,7 +6,7 @@ export type FilterNever<T> = {
 };
 
 export type InferPayload<T> =
-	T extends Contract<infer TBody, infer TQuery, infer TParams, z.ZodType>
+	T extends Contract<infer TBody, infer TQuery, infer TParams>
 		? {
 				body: z.infer<TBody>;
 				query: z.infer<TQuery>;
@@ -17,6 +17,11 @@ export type InferPayload<T> =
 export type InferResponse<T> =
 	T extends Contract<z.ZodType, z.ZodType, z.ZodType, infer TResponse>
 		? z.infer<TResponse>
+		: never;
+
+export type InferErrors<T> =
+	T extends Contract<z.ZodType, z.ZodType, z.ZodType, z.ZodType, infer TErrors>
+		? TErrors
 		: never;
 
 export interface ClientOptions {

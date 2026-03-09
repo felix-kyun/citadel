@@ -1,20 +1,33 @@
 import qs from "qs";
+import z from "zod";
 import type { Contract } from "../types/Contract";
 import type {
 	ClientOptions,
+	InferErrors,
 	InferPayload,
 	InferResponse,
 } from "../types/utils";
 import { replacePathParams } from "../utils/replacePathParams";
-import { ClientError } from "./ClientError";
 
-export interface ClientResponse<TContract extends Contract> {
-	code: string;
-	data: InferResponse<TContract>;
+export type ClientResponse<
+	TContract extends Contract,
+	TContext extends
+		| InferResponse<TContract>
+		| z.infer<InferErrors<TContract>[number]["ctx"]> = InferResponse<TContract>,
+> = {
 	status: number;
 	headers: Headers;
 	ok: boolean;
-}
+} & (
+	| {
+			code: "SUCCESS";
+			ctx: TContext;
+	  }
+	| {
+			code: InferErrors<TContract>[number]["code"];
+			ctx: z.infer<InferErrors<TContract>[number]["ctx"]>;
+	  }
+);
 
 export async function fetchClient<TContract extends Contract>(
 	contract: TContract,
@@ -59,25 +72,40 @@ export async function fetchClient<TContract extends Contract>(
 		...init,
 		headers,
 	});
-	const response = await raw.json();
 
-	const validatedResponse = contract.response.parse(response);
-	if (validatedResponse.code !== "SUCCESS") {
-		throw new ClientError({
-			code: validatedResponse.code,
-			other: response,
+	const baseSchema = z.object({
+		code: z.enum([
+			"SUCCESS",
+			...(contract.errors.map(
+				(e) => e.code,
+			) as InferErrors<TContract>[number]["code"][]),
+		]),
+		ctx: z.unknown(),
+	});
+
+	const response = await raw.json();
+	const parsed = baseSchema.parse(response);
+
+	if (parsed.code !== "SUCCESS") {
+		const ctx = contract.errors
+			.find((e) => e.code === parsed.code)
+			?.ctx.parse(parsed.ctx);
+
+		return {
+			code: parsed.code,
 			status: raw.status,
 			headers: raw.headers,
-			message: "not implemented",
-		});
+			ok: raw.ok,
+			ctx: ctx as z.infer<InferErrors<TContract>[number]["ctx"]>,
+		};
+	} else {
+		const validatedResponse = contract.response.parse(response);
+		return {
+			code: "SUCCESS",
+			status: raw.status,
+			headers: raw.headers,
+			ok: raw.ok,
+			ctx: validatedResponse.data as InferResponse<TContract>,
+		};
 	}
-
-	// return validatedResponse.data as InferResponse<TContract>;
-	return {
-		code: validatedResponse.code,
-		data: validatedResponse.data as InferResponse<TContract>,
-		status: raw.status,
-		headers: raw.headers,
-		ok: raw.ok,
-	};
 }

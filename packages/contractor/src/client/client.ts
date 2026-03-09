@@ -1,10 +1,9 @@
 import type { Contract } from "../types/Contract";
-import { __contract_type } from "../types/Contract";
 import type { ClientOptions, FilterNever, InferPayload } from "../types/utils";
 import { type ClientResponse, fetchClient } from "./fetchClient";
 
 function isContract(schema: SchemaNode | Contract): schema is Contract {
-	return schema && "_type" in schema && schema._type === __contract_type;
+	return schema && "_type" in schema && schema._type === "contractor/contract";
 }
 
 type Transform<T> = {
@@ -43,9 +42,10 @@ export function createClient<T extends SchemaNode>(
 	schema: T,
 	options: ClientOptions,
 ) {
+	const localOptions = structuredClone(options);
 	// fix base url for use URL
-	if (!options.baseUrl.endsWith("/")) {
-		options.baseUrl = `${options.baseUrl}/`;
+	if (!localOptions.baseUrl.endsWith("/")) {
+		localOptions.baseUrl = `${localOptions.baseUrl}/`;
 	}
 
 	return buildSchema(schema, options);
