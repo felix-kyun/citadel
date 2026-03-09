@@ -9,9 +9,3 @@ export interface ContractError<
 	message: string;
 	ctx: TContext;
 }
-
-export function createError<TCode extends string, TContext extends z.ZodType>(
-	error: ContractError<TCode, TContext>,
-): ContractError<TCode, TContext> {
-	return error;
-}

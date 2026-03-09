@@ -1,9 +1,8 @@
 import z from "zod";
-import { createError } from "../types/ContractError";
+import { defineError } from "../utils/defineError";
 
-export const serverError = createError({
+export const serverError = defineError({
 	status: 500,
 	message: "Internal Server Error",
 	code: "serverError",
-	ctx: z.never(),
 });
