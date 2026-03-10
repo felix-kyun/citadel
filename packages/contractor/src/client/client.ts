@@ -48,5 +48,5 @@ export function createClient<T extends SchemaNode>(
 		localOptions.baseUrl = `${localOptions.baseUrl}/`;
 	}
 
-	return buildSchema(schema, options);
+	return buildSchema(schema, localOptions);
 }
