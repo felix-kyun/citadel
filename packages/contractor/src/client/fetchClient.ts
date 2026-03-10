@@ -9,19 +9,14 @@ import type {
 } from "../types/utils";
 import { replacePathParams } from "../utils/replacePathParams";
 
-export type ClientResponse<
-	TContract extends Contract,
-	TContext extends
-		| InferResponse<TContract>
-		| z.infer<InferErrors<TContract>[number]["ctx"]> = InferResponse<TContract>,
-> = {
+export type ClientResponse<TContract extends Contract> = {
 	status: number;
 	headers: Headers;
 	ok: boolean;
 } & (
 	| {
 			code: "SUCCESS";
-			ctx: TContext;
+			ctx: InferResponse<TContract>;
 	  }
 	| {
 			code: InferErrors<TContract>[number]["code"];
