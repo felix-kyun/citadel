@@ -60,8 +60,10 @@ export async function fetchClient<TContract extends Contract>(
 	}
 
 	const finalUrl = url.toString();
-	const init: RequestInit = {};
-	const headers: Record<string, string> = {};
+	const init: RequestInit = {
+		method: contract.method,
+	};
+	const headers: RequestInit["headers"] = {};
 
 	if (contract.method !== "GET") {
 		init.body = JSON.stringify(body);
@@ -99,7 +101,7 @@ export async function fetchClient<TContract extends Contract>(
 			ctx: ctx as z.infer<InferErrors<TContract>[number]["ctx"]>,
 		};
 	} else {
-		const validatedResponse = contract.response.parse(response);
+		const validatedResponse = contract.response.parse(parsed.ctx);
 		return {
 			code: "SUCCESS",
 			status: raw.status,
