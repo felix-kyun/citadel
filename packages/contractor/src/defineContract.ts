@@ -52,6 +52,7 @@ export function defineContract<
 >(contract: {
 	method: TMethod;
 	route: TRoute;
+	status?: number;
 	payload?: Payload<TMethod, TRoute, TBody, TQuery>;
 	response?: TResponse;
 	errors?: TErrors;
@@ -71,6 +72,7 @@ export function defineContract<
 		_type: "contractor/contract" as const,
 		method: contract.method,
 		route: contract.route,
+		status: contract.status ?? 200,
 		payload: {
 			body,
 			query,

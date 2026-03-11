@@ -1,10 +1,8 @@
 import type { Contract } from "../types/Contract";
+import type { SchemaNode } from "../types/SchemaNode";
 import type { ClientOptions, FilterNever, InferPayload } from "../types/utils";
+import { isContract } from "../utils/isContract";
 import { type ClientResponse, fetchClient } from "./fetchClient";
-
-function isContract(schema: SchemaNode | Contract): schema is Contract {
-	return schema && "_type" in schema && schema._type === "contractor/contract";
-}
 
 type Transform<T> = {
 	[K in keyof T]: T[K] extends Contract
@@ -13,10 +11,6 @@ type Transform<T> = {
 			) => Promise<ClientResponse<T[K]>>
 		: Transform<T[K]>;
 };
-
-interface SchemaNode {
-	[key: string]: SchemaNode | Contract;
-}
 
 function buildSchema<T extends SchemaNode>(
 	root: T,

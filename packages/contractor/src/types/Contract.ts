@@ -12,6 +12,7 @@ export interface Contract<
 	readonly _type: "contractor/contract";
 	method: Method;
 	route: string;
+	status: number;
 	payload: {
 		body: TBody;
 		query: TQuery;
